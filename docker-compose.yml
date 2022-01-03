@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  predict_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.predict
+    image: mlops-app
+    container_name: mlops-app
+    ports:
+      - "50:50"
+    environment:
+      - PG_PORT=5432
+      - PG_USER=postgres
+      - PG_PASSWORD=postgres12345
+      - PG_DATABASE=mlops_db
+    links:
+      - db
+    volumes:
+      - ./app:/app
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    image: mlops-db
+    container_name: mlops-db
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres12345
+      - PGPASSWORD=postgres12345
+      - POSTGRES_DB=mlops_db
+      - DATABASE_HOST=localhost
+    volumes:
+      - ./db:/db
+      - ./db/init:/docker-entrypoint-initdb.d
