@@ -18,6 +18,7 @@ services:
       - db
     volumes:
       - ./app:/app
+      - ./ml:/ml
 
   db:
     build:
