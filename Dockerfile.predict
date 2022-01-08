@@ -5,12 +5,16 @@ WORKDIR /app
 COPY ./app /app
 
 RUN pip install --upgrade pip && pip install \
-  Flask \
+  dash \
   numpy \
   pandas \
   scikit-learn \
   psycopg2 \
   sqlalchemy
 
-EXPOSE 50
-CMD ["python3", "index.py"]
+ENV LANG ja_JP.UTF-8
+ENV LANGUAGE ja_JP:ja
+ENV LC_ALL ja_JP.UTF-8
+
+EXPOSE 5050
+CMD ["python3", "app.py"]

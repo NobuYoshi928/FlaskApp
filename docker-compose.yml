@@ -8,7 +8,7 @@ services:
     image: mlops-app
     container_name: mlops-app
     ports:
-      - "50:50"
+      - "5050:5050"
     environment:
       - PG_PORT=5432
       - PG_USER=postgres
@@ -37,3 +37,22 @@ services:
     volumes:
       - ./db:/db
       - ./db/init:/docker-entrypoint-initdb.d
+  
+  notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile.notebook
+    image: mlops-notebook
+    container_name: mlops-notebook
+    ports:
+      - "8887:8888"
+    environment:
+      - PG_PORT=5432
+      - PG_USER=postgres
+      - PG_PASSWORD=postgres12345
+      - PG_DATABASE=mlops_db
+      - JUPYTER_ENABLE_LAB=yes
+    links:
+      - db
+    volumes:
+      - ./ml:/work
