@@ -1,4 +1,5 @@
 import datetime
+import os
 import pickle
 
 import dash
@@ -8,14 +9,24 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import psycopg2
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, auc, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 
-train_df = pd.read_csv("../ml/data/train1.csv")
-userinput_df = pd.read_csv("../ml/data/train2.csv")
-model = pickle.load(open("../ml/models/LR_20220106160300.pkl", "rb"))
+train_df = pd.read_csv("./ml/data/train1.csv")
+userinput_df = pd.read_csv("./ml/data/train2.csv")
+model = pickle.load(open("./ml/deploy/20220108055328/models/mlmodel.pkl", "rb"))
+pgconfig = {
+    "host": "db",
+    "port": os.environ["PG_PORT"],
+    "database": os.environ["PG_DATABASE"],
+    "user": os.environ["PG_USER"],
+    "password": os.environ["PG_PASSWORD"],
+}
+dsl = "postgresql://{user}:{password}@{host}:{port}/{database}".format(**pgconfig)
+conn = psycopg2.connect(**pgconfig)
 
 
 def preprocessing(df):
@@ -27,7 +38,6 @@ def preprocessing(df):
 def create_roc_curve():
     train_X, train_y = preprocessing(train_df)
     userinput_X, userinput_y = preprocessing(userinput_df)
-    model = pickle.load(open("../ml/models/LR_20220106160300.pkl", "rb"))
     train_y_score = model.predict_proba(train_X)[:, 1]
     userinput_y_score = model.predict_proba(userinput_X)[:, 1]
     train_fpr, train_tpr, train_thresholds = roc_curve(train_y, train_y_score)

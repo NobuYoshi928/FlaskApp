@@ -65,7 +65,7 @@ def evaluate_model(model, test_df):
 def train_and_evaluate_model(df, C):
     try:
         run_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        evaluate_dir = f"../evaluate/{run_id}/"
+        evaluate_dir = f"./evaluate/{run_id}/"
         os.makedirs(f"{evaluate_dir}data/")
         os.makedirs(f"{evaluate_dir}models/")
         src_output_path = f"{evaluate_dir}data/src.pkl"
@@ -82,10 +82,10 @@ def train_and_evaluate_model(df, C):
 
 def train_and_deploy_model(run_id, C):
     try:
-        deploy_dir = f"../deploy/{run_id}/"
+        deploy_dir = f"./deploy/{run_id}/"
         os.makedirs(f"{deploy_dir}data/")
         os.makedirs(f"{deploy_dir}models/")
-        src_df = pd.read_pickle(f"../evaluate/{run_id}/data/src.pkl")
+        src_df = pd.read_pickle(f"./evaluate/{run_id}/data/src.pkl")
         train_df, imputer = preprocess_train(src_df, deploy_dir)
         train_model(train_df, C, deploy_dir)
         print("deploy finished")
