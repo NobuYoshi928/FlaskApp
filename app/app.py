@@ -1,25 +1,29 @@
-import datetime
-import os
+import json
 import pickle
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import psycopg2
 from dash.dependencies import Input, Output, State
-from ml.utils import db, ml_workflow
 from plotly.subplots import make_subplots
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, auc, roc_curve
+from sklearn.metrics import roc_curve
 
-model_id = "20220110115017"
-imputer = pickle.load(open(f"./ml/deploy/{model_id}/models/imputer.pkl", "rb"))
-model = pickle.load(open(f"./ml/deploy/{model_id}/models/mlmodel.pkl", "rb"))
-conn, engine = db.connect("dev")
+from utils import db_utils, ml_utils
+
+# デプロイパラメタから対象リソースを取得
+with open("./deploy_param.json") as f:
+    deploy_param = json.load(f)
+index_id = deploy_param["index_id"]
+imputer_id = deploy_param["imputer_id"]
+model_id = deploy_param["model_id"]
+imputer = pickle.load(open(f"./deploy/model/imputer_{imputer_id}.pkl", "rb"))
+model = pickle.load(open(f"./deploy/model/model_{model_id}.pkl", "rb"))
+
+# DB接続
+conn, engine = db_utils.connect("dev")
 train_df = pd.read_sql(
     sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained is True;", con=conn
 ).drop("is_trained", axis=1, inplace=False)
@@ -63,32 +67,32 @@ results_temp_columns = (
 
 
 def update_tables():
-    with open(f"./ml/deploy/{model_id}/train_indexes.txt", mode="r") as f:
+    with open(f"./deploy/data/src_index_{index_id}.txt", mode="r") as f:
         trained_indexes = f.readlines()[0]
     sql = f"""
         UPDATE diabetes_diagnosis_results SET is_trained = True 
         WHERE index in ({trained_indexes})
         """
-    db.execute(conn, sql)
+    db_utils.execute(conn, sql)
     sql = f"""
         UPDATE diabetes_diagnosis_results SET is_trained = False 
         WHERE index not in ({trained_indexes})
         """
-    db.execute(conn, sql)
+    db_utils.execute(conn, sql)
     sql = f"""
         DELETE FROM predict_results
         WHERE index in ({trained_indexes})
         """
-    db.execute(conn, sql)
+    db_utils.execute(conn, sql)
     sql = f"""
         DELETE FROM results_temp;
         """
-    db.execute(conn, sql)
+    db_utils.execute(conn, sql)
 
 
 def create_roc_curve():
     train_X, train_y = train_df.iloc[:, :-1], train_df.iloc[:, -1]
-    train_X, _ = ml_workflow.preprocess_train(train_X)
+    train_X, _ = ml_utils.preprocess_train(train_X)
     train_y_score = model.predict_proba(train_X)[:, 1]
     train_fpr, train_tpr, _ = roc_curve(train_y, train_y_score)
     fig = go.Figure()
@@ -106,7 +110,7 @@ def create_roc_curve():
         )
     fig.update_layout(
         title="ROC curve",
-        width=400,
+        width=500,
         height=300,
     )
     fig.update_xaxes(title="False Positive Rate")
@@ -131,7 +135,7 @@ def create_label_counts():
     )
     fig.update_layout(
         title="True Lavel Counts",
-        width=600,
+        width=500,
         height=300,
     )
     fig.update_xaxes(title="Data Type")
@@ -380,7 +384,7 @@ def predict(
             "age": [age],
         }
         input_df = pd.DataFrame(input_dict)
-        input_y_proba, input_y_pred = ml_workflow.predict(input_df, imputer, model)
+        input_y_proba, input_y_pred = ml_utils.predict(input_df, imputer, model)
         input_df["predict_result"] = input_y_pred[0]
         input_df["predict_probability"] = input_y_proba[0]
         input_df["index"] = index

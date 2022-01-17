@@ -22,7 +22,8 @@ services:
       - db
     volumes:
       - ./app:/app
-      - ./ml:/app/ml
+      - ./ml/resources/deploy:/app/deploy
+      - ./ml/utils:/app/utils
 
   db:
     build:

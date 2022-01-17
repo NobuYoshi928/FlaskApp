@@ -1,2 +1,3 @@
-ml/deploy
-ml/evaluate
+ml/.ipynb_checkpoints/
+ml/utils/.ipynb_checkpoints/
+ml/utils/__pycache__/
