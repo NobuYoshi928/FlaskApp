@@ -4,7 +4,7 @@ services:
   predict_app:
     build:
       context: .
-      dockerfile: Dockerfile.predict
+      dockerfile: Dockerfile.predict_dev
     image: mlops-app
     container_name: mlops-app
     ports:
