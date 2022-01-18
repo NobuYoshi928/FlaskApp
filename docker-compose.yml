@@ -14,11 +14,16 @@ services:
       - PG_USER=postgres
       - PG_PASSWORD=postgres12345
       - PG_DATABASE=mlops_db
+      - PG_PORT_PRD=5432
+      - PG_USER_PRD=postgres
+      - PG_PASSWORD_PRD=postgres12345
+      - PG_DATABASE_PRD=mlops_db
     links:
       - db
     volumes:
       - ./app:/app
-      - ./ml:/ml
+      - ./ml/resources/deploy:/app/deploy
+      - ./ml/utils:/app/utils
 
   db:
     build:
