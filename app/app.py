@@ -10,7 +10,6 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 from sklearn.metrics import roc_curve
-
 from utils import db_utils, ml_utils
 
 # デプロイパラメタから対象リソースを取得
@@ -443,7 +442,7 @@ def register(n_clicks, index, is_prediction_true):
             )
             return f"登録しました"
         except:
-            print("登録済みです")
+            return "登録済みです"
 
 
 if __name__ == "__main__":

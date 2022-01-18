@@ -12,5 +12,3 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Container
         run: docker-compose up -d --build
-      - name: Run a flask test script
-        run: docker-compose exec -T predict_app python3 test.py
