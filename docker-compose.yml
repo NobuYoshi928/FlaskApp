@@ -15,9 +15,9 @@ services:
       - PG_PASSWORD=postgres12345
       - PG_DATABASE=mlops_db
       - PG_PORT_PRD=5432
-      - PG_USER_PRD=postgres
-      - PG_PASSWORD_PRD=postgres12345
-      - PG_DATABASE_PRD=mlops_db
+      - PG_USER_PRD=qejymygxyhmqox
+      - PG_PASSWORD_PRD="${PG_PASSWORD_PRD}"
+      - PG_DATABASE_PRD=deogivl4vrki52
     links:
       - db
     volumes:

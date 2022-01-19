@@ -5,6 +5,8 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+env:
+  PG_PASSWORD_PRD: ${{ secrets.PG_PASSWORD_PRD }}
 jobs:
   build:
     runs-on: ubuntu-latest
