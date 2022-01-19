@@ -1,8 +1,6 @@
-name: CI
+name: CICD
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
   workflow_dispatch:
 env:
@@ -12,5 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build Container
-        run: docker-compose up -d --build
+      - uses: akhileshns/heroku-deploy@v3.8.8
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "mlops-diabetes-diagnosis-app"
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          dockerfile_directory: ./
+          dockerfile_name: Dockerfile.predict_prd
+          docker_options: "--no-cache"
+
