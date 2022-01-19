@@ -1,4 +1,5 @@
 import json
+import os
 import pickle
 
 import dash
@@ -10,9 +11,11 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 from sklearn.metrics import roc_curve
+
 from utils import db_utils, ml_utils
 
 # デプロイパラメタから対象リソースを取得
+env = os.getenv("APP_ENV")
 with open("./deploy_param.json") as f:
     deploy_param = json.load(f)
 index_id = deploy_param["index_id"]
@@ -21,8 +24,8 @@ model_id = deploy_param["model_id"]
 imputer = pickle.load(open(f"./deploy/model/imputer_{imputer_id}.pkl", "rb"))
 model = pickle.load(open(f"./deploy/model/model_{model_id}.pkl", "rb"))
 
-# DB接続
-conn, engine = db_utils.connect("dev")
+# DB接続とDataFrameへの読み込み
+conn, engine = db_utils.connect(env)
 train_df = pd.read_sql(
     sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained is True;", con=conn
 ).drop("is_trained", axis=1, inplace=False)
@@ -64,7 +67,7 @@ results_temp_columns = (
     "predict_probability",
 )
 
-
+# デプロイ時のDB更新
 def update_tables():
     with open(f"./deploy/data/src_index_{index_id}.txt", mode="r") as f:
         trained_indexes = f.readlines()[0]
@@ -178,7 +181,7 @@ external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-
+# レイアウト
 app.layout = html.Div(
     children=[
         html.H1(children="糖尿病予測アプリ"),
@@ -340,7 +343,7 @@ app.layout = html.Div(
     ]
 )
 
-
+# コールバック
 @app.callback(
     Output(component_id="predict_result", component_property="children"),
     [Input(component_id="predict-button", component_property="n_clicks")],

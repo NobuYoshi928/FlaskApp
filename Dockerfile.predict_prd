@@ -3,6 +3,8 @@ FROM python:3.7.4
 WORKDIR /app
 
 COPY ./app /app
+COPY ./ml/utils /app/utils
+COPY ./ml/resources/deploy /app/deploy
 
 RUN pip install --upgrade pip && pip install \
   dash==2.0.0 \
@@ -12,9 +14,10 @@ RUN pip install --upgrade pip && pip install \
   psycopg2==2.9.3 \
   sqlalchemy==1.4.29
 
+ENV APP_ENV prd
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
 
 EXPOSE 5050
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]
