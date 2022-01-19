@@ -10,10 +10,12 @@ services:
     ports:
       - "5050:5050"
     environment:
+      - PG_HOST=db
       - PG_PORT=5432
       - PG_USER=postgres
       - PG_PASSWORD=postgres12345
       - PG_DATABASE=mlops_db
+      - PG_HOST_PRD=ec2-54-236-156-167.compute-1.amazonaws.com
       - PG_PORT_PRD=5432
       - PG_USER_PRD=qejymygxyhmqox
       - PG_PASSWORD_PRD="${PG_PASSWORD_PRD}"
