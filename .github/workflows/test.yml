@@ -28,4 +28,4 @@ jobs:
         run: |
           IMAGE_TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile.predict_prd .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push public.ecr.aws/a2h7r5m3/$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
