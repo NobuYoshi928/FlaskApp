@@ -1,8 +1,9 @@
-name: CICD
+name: Build and Push
+
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - v*
 env:
   PG_PASSWORD_PRD: ${{ secrets.PG_PASSWORD_PRD }}
 jobs:
