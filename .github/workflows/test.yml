@@ -6,6 +6,12 @@ on:
       - main
 env:
   PG_PASSWORD_PRD: ${{ secrets.PG_PASSWORD_PRD }}
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY: mlops-diabetes-diagnosis-app
+  ECS_SERVICE: mlops-diabetes-diagnosis-ecs-service
+  ECS_CLUSTER: mlops-diabetes-diagnosis-ecs-cluster
+  ECS_TASK_DEFINITION: ./app_task_definition.json
+  CONTAINER_NAME: mlops-diabetes-diagnosis-ecs-container
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,10 +28,27 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR (APP)
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO_NAME_APP }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f Dockerfile.predict_prd .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest       
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true  
       
