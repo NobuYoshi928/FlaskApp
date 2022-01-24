@@ -28,28 +28,26 @@ services:
       - ./ml/utils:/app/utils
 
   db:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
-    image: mlops-db
+    image: mysql:5.7
     container_name: mlops-db
-    ports:
-      - "5431:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres12345
-      - PGPASSWORD=postgres12345
-      - POSTGRES_DB=mlops_db
-      - DATABASE_HOST=localhost
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./db:/db
-      - ./db/init:/docker-entrypoint-initdb.d
+      - ./db/data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
   
   notebook:
     build:
       context: .
       dockerfile: Dockerfile.notebook
-    image: mlops-notebook
     container_name: mlops-notebook
     ports:
       - "8887:8888"
@@ -58,6 +56,9 @@ services:
       - PG_USER=postgres
       - PG_PASSWORD=postgres12345
       - PG_DATABASE=mlops_db
+      - MYSQL_DATABASE=test_database
+      - MYSQL_USER=docker
+      - MYSQL_PASSWORD=docker
       - JUPYTER_ENABLE_LAB=yes
     links:
       - db

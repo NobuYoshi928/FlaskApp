@@ -2,3 +2,4 @@ ml/.ipynb_checkpoints/
 ml/temp/
 ml/utils/.ipynb_checkpoints/
 ml/utils/__pycache__/
+db/data/
