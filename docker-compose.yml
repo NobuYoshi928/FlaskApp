@@ -10,16 +10,11 @@ services:
     ports:
       - "5050:5050"
     environment:
-      - PG_HOST=db
-      - PG_PORT=5432
-      - PG_USER=postgres
-      - PG_PASSWORD=postgres12345
-      - PG_DATABASE=mlops_db
-      - PG_HOST_PRD=ec2-54-236-156-167.compute-1.amazonaws.com
-      - PG_PORT_PRD=5432
-      - PG_USER_PRD=qejymygxyhmqox
-      - PG_PASSWORD_PRD="${PG_PASSWORD_PRD}"
-      - PG_DATABASE_PRD=deogivl4vrki52
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=test_database
+      - MYSQL_USER=docker
+      - MYSQL_PASSWORD=docker
     links:
       - db
     volumes:
@@ -52,10 +47,8 @@ services:
     ports:
       - "8887:8888"
     environment:
-      - PG_PORT=5432
-      - PG_USER=postgres
-      - PG_PASSWORD=postgres12345
-      - PG_DATABASE=mlops_db
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
       - MYSQL_DATABASE=test_database
       - MYSQL_USER=docker
       - MYSQL_PASSWORD=docker

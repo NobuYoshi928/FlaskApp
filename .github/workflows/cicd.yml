@@ -5,13 +5,14 @@ on:
     branches:
       - main
 env:
-  PG_PASSWORD_PRD: ${{ secrets.PG_PASSWORD_PRD }}
   AWS_REGION: ap-northeast-1
   ECR_REPOSITORY: mlops-diabetes-diagnosis-app
   ECS_SERVICE: mlops-diabetes-diagnosis-ecs-service2
   ECS_CLUSTER: mlops-diabetes-diagnosis-ecs-cluster
   ECS_TASK_DEFINITION: ./app_task_definition.json
   CONTAINER_NAME: mlops-diabetes-diagnosis-ecs-container
+  MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
 jobs:
   build:
     runs-on: ubuntu-latest
