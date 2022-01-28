@@ -11,7 +11,6 @@ env:
   ECS_CLUSTER: mlops-diabetes-diagnosis-ecs-cluster
   ECS_TASK_DEFINITION: ./app_task_definition.json
   CONTAINER_NAME: mlops-diabetes-diagnosis-ecs-container
-  MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
   MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
 jobs:
   build:
@@ -33,7 +32,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f Dockerfile.predict_prd .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f Dockerfile.predict_prd --build-arg MYSQL_HOST=$MYSQL_HOST --build-arg MYSQL_PASSWORD=$MYSQL_PASSWORD .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
