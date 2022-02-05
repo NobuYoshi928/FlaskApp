@@ -12,10 +12,12 @@ services:
     environment:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
-      - MYSQL_DATABASE=test_database
-      - MYSQL_USER=docker
-      - MYSQL_PASSWORD=docker
+      - MYSQL_DATABASE=docker_db
+      - MYSQL_USER=docker_user
+      - MYSQL_PASSWORD=docker_pass
     links:
+      - db
+    depends_on:
       - db
     volumes:
       - ./app:/app
@@ -26,16 +28,16 @@ services:
     image: mysql:5.7
     container_name: mlops-db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_database
-      MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: docker_db
+      MYSQL_USER: docker_user
+      MYSQL_PASSWORD: docker_pass
       TZ: 'Asia/Tokyo'
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./db/data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./db/sql:/docker-entrypoint-initdb.d
+      - ./db/init:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
   
@@ -49,9 +51,9 @@ services:
     environment:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
-      - MYSQL_DATABASE=test_database
-      - MYSQL_USER=docker
-      - MYSQL_PASSWORD=docker
+      - MYSQL_DATABASE=docker_db
+      - MYSQL_USER=docker_user
+      - MYSQL_PASSWORD=docker_pass
       - JUPYTER_ENABLE_LAB=yes
     links:
       - db

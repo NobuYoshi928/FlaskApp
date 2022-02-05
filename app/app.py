@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
-from sklearn.metrics import roc_curve
+from sklearn.metrics import auc, roc_curve
 
 from utils import db_utils, ml_utils
 
@@ -26,10 +26,10 @@ model = pickle.load(open(f"./deploy/model/model_{model_id}.pkl", "rb"))
 # DB接続とDataFrameへの読み込み
 conn, engine = db_utils.connect()
 train_df = pd.read_sql(
-    sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained is True;", con=conn
+    sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained = 0;", con=conn
 ).drop("is_trained", axis=1, inplace=False)
 not_train_df = pd.read_sql(
-    sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained is False;", con=conn
+    sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained = 1;", con=conn
 ).drop("is_trained", axis=1, inplace=False)
 predict_result_df = pd.read_sql(sql="SELECT * FROM predict_results;", con=conn)
 src_columns = (
@@ -71,12 +71,12 @@ def update_tables():
     with open(f"./deploy/data/src_index_{index_id}.txt", mode="r") as f:
         trained_indexes = f.readlines()[0]
     sql = f"""
-        UPDATE diabetes_diagnosis_results SET is_trained = True 
+        UPDATE diabetes_diagnosis_results SET is_trained = 0
         WHERE id in ({trained_indexes})
         """
     db_utils.execute(conn, sql)
     sql = f"""
-        UPDATE diabetes_diagnosis_results SET is_trained = False 
+        UPDATE diabetes_diagnosis_results SET is_trained = 1
         WHERE id not in ({trained_indexes})
         """
     db_utils.execute(conn, sql)
@@ -100,17 +100,21 @@ def create_roc_curve():
     fig.add_trace(
         go.Scatter(x=train_fpr, y=train_tpr, name="train data", fill="tozeroy")
     )
+    warning_msg = ""
     if len(predict_result_df) > 0:
         userinput_y = predict_result_df["true_result"].values
         userinput_y_score = predict_result_df["predict_probability"].values
         userinput_fpr, userinput_tpr, _ = roc_curve(userinput_y, userinput_y_score)
+        userinput_auc = auc(userinput_fpr, userinput_tpr)
+        if userinput_auc < 0.75:
+            warning_msg = "（Warning: AUCスコアが基準値以下です）"
         fig.add_trace(
             go.Scatter(
                 x=userinput_fpr, y=userinput_tpr, name="predict data", fill="tozeroy"
             )
         )
     fig.update_layout(
-        title="ROC curve",
+        title=f"ROC curve {warning_msg}",
         width=500,
         height=300,
     )
@@ -129,7 +133,7 @@ def create_label_counts():
         lambda x: "陽性" if x == 1 else "陰性"
     )
     value_counts_df["is_trained"] = value_counts_df["is_trained"].apply(
-        lambda x: "train data" if x else "predict data"
+        lambda x: "train data" if x == 0 else "predict data"
     )
     fig = px.histogram(
         value_counts_df, x="is_trained", y="id", color="outcome", barmode="group"
@@ -158,12 +162,14 @@ def show_features_histgram():
     ]
     for i, column in enumerate(columns):
         fig.add_trace(
-            go.Histogram(x=train_df[column].values), row=(i // 4 + 1), col=(i % 4 + 1)
+            go.Histogram(x=train_df[column].values, name=f"{column}_train"),
+            row=(i // 4 + 1),
+            col=(i % 4 + 1),
         )
         fig.update_xaxes(title=column, row=(i // 4 + 1), col=(i % 4 + 1))
     for i, column in enumerate(columns):
         fig.add_trace(
-            go.Histogram(x=not_train_df[column].values),
+            go.Histogram(x=not_train_df[column].values, name=f"{column}_predict"),
             row=(i // 4 + 1),
             col=(i % 4 + 1),
         )
@@ -427,7 +433,7 @@ def register(n_clicks, id, is_prediction_true):
         temp_df = temp_df[["id", "predict_result", "predict_probability"]]
         temp_df["true_result"] = true_result
         temp_df["model_id"] = model_id
-        temp_df.reindex(id=predict_result_columns)
+        temp_df.reindex(index=predict_result_columns)
         try:
             src_record_df.to_sql(
                 "diabetes_diagnosis_results",

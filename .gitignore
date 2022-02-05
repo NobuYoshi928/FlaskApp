@@ -3,5 +3,6 @@ ml/data/.ipynb_checkpoints/
 ml/utils/.ipynb_checkpoints/
 ml/utils/__pycache__/
 ml/temp/
+ml/data/
 db/data/
 .github/workflows/deploy.yml
