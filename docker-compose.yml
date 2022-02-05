@@ -3,7 +3,7 @@ version: "3"
 services:
   predict_app:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile.predict_dev
     image: mlops-app
     container_name: mlops-app
@@ -21,8 +21,6 @@ services:
       - db
     volumes:
       - ./app:/app
-      - ./ml/resources/deploy:/app/deploy
-      - ./ml/utils:/app/utils
 
   db:
     image: mysql:5.7
@@ -43,7 +41,7 @@ services:
   
   notebook:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile.notebook
     container_name: mlops-notebook
     ports:
@@ -58,4 +56,4 @@ services:
     links:
       - db
     volumes:
-      - ./ml:/work
+      - ./app/ml:/work

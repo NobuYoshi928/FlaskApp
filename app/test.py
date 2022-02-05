@@ -3,7 +3,7 @@ import app
 if __name__ == "__main__":
     app.predict(
         n_clicks=1,
-        index=2732,
+        id=2732,
         pregnancies=2,
         glucose=108,
         blood_pressure=80,

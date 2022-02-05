@@ -1,0 +1,21 @@
+FROM python:3.7.4
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install --upgrade pip && pip install \
+  dash==2.0.0 \
+  numpy==1.17.2 \
+  pandas==0.25.1 \
+  scikit-learn==0.21.3 \
+  PyMySQL==1.0.2 \
+  sqlalchemy==1.4.29
+
+ENV APP_ENV dev
+ENV LANG ja_JP.UTF-8
+ENV LANGUAGE ja_JP:ja
+ENV LC_ALL ja_JP.UTF-8
+
+EXPOSE 5050
+CMD ["python", "app.py"]

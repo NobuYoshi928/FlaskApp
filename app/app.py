@@ -1,5 +1,4 @@
 import json
-import os
 import pickle
 
 import dash
@@ -12,7 +11,7 @@ from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 from sklearn.metrics import auc, roc_curve
 
-from utils import db_utils, ml_utils
+from ml.utils import db_utils, ml_utils
 
 # デプロイパラメタから対象リソースを取得
 with open("./deploy_param.json") as f:
@@ -20,8 +19,10 @@ with open("./deploy_param.json") as f:
 index_id = deploy_param["index_id"]
 imputer_id = deploy_param["imputer_id"]
 model_id = deploy_param["model_id"]
-imputer = pickle.load(open(f"./deploy/model/imputer_{imputer_id}.pkl", "rb"))
-model = pickle.load(open(f"./deploy/model/model_{model_id}.pkl", "rb"))
+imputer = pickle.load(
+    open(f"./ml/resources/deploy/model/imputer_{imputer_id}.pkl", "rb")
+)
+model = pickle.load(open(f"./ml/resources/deploy/model/model_{model_id}.pkl", "rb"))
 
 # DB接続とDataFrameへの読み込み
 conn, engine = db_utils.connect()
@@ -68,7 +69,7 @@ results_temp_columns = (
 
 # デプロイ時のDB更新
 def update_tables():
-    with open(f"./deploy/data/src_index_{index_id}.txt", mode="r") as f:
+    with open(f"./ml/resources/deploy/data/src_index_{index_id}.txt", mode="r") as f:
         trained_indexes = f.readlines()[0]
     sql = f"""
         UPDATE diabetes_diagnosis_results SET is_trained = 0
