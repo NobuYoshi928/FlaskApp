@@ -1,6 +1,4 @@
-CREATE DATABASE IF NOT EXISTS docker;
-
-CREATE TABLE IF NOT EXISTS docker.diabetes_diagnosis_results(
+create table if not exists diabetes_diagnosis_results(
     id INT(10),
     pregnancies INT(10),
     glucose INT(10),
@@ -15,7 +13,7 @@ CREATE TABLE IF NOT EXISTS docker.diabetes_diagnosis_results(
     primary key (id)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE IF NOT EXISTS docker.results_temp(
+CREATE TABLE results_temp(
     id INT(10),
     pregnancies INT(10),
     glucose INT(10),
@@ -28,13 +26,23 @@ CREATE TABLE IF NOT EXISTS docker.results_temp(
     predict_result INTEGER,
     predict_probability FLOAT(10),
     primary key (id)
-) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+);
 
-CREATE TABLE IF NOT EXISTS docker.predict_results(
+CREATE TABLE predict_results(
     id INT(10),
     predict_result INT(10),
     predict_probability FLOAT(10),
     true_result INT(10),
     model_id INT(10),
     primary key (id)
-) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+);
+
+load data local 
+    infile '~/work/init_train_data.csv'
+into table
+    diabetes_diagnosis_results
+fields
+    terminated by ','
+    enclosed by '"';
+
+※ load時のエラーの参考記事  http://taustation.com/mysql-csv-file-import-error/

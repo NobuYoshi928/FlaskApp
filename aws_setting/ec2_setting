@@ -1,0 +1,14 @@
+# 踏み台へのアクセス
+$ ssh -i ~/.ssh/mlops-diabetes-diagnosis.pem ubuntu@54.92.80.174
+
+# 踏み台へファイルをアップロード
+$ scp -i ~/.ssh/mlops-diabetes-diagnosis.pem ml/data/init_train_data.csv ubuntu@54.92.80.174:~/work
+※ 参考記事 https://gallardolp570.hatenablog.com/entry/2014/11/17/205325
+
+# 踏み台の初期設定
+$ sudo apt update
+$ apt search mysql-client
+$ sudo apt install mysql-client-core-8.0
+
+# RDSに接続
+$ mysql -h mlops-diabetes-diagnosis-mysql.ceotro9vqmgd.ap-northeast-1.rds.amazonaws.com -P 3306 -u admin -D diabetes_diagnosis -p

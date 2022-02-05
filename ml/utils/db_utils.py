@@ -1,28 +1,20 @@
 import os
 
-import psycopg2
+import pymysql.cursors
 from sqlalchemy import create_engine
 
 
-def connect(env):
-    if env == "dev":
-        pgconfig = {
-            "host": "db",
-            "port": os.environ["PG_PORT"],
-            "database": os.environ["PG_DATABASE"],
-            "user": os.environ["PG_USER"],
-            "password": os.environ["PG_PASSWORD"],
-        }
-    elif env == "prd":
-        pgconfig = {
-            "host": "db",
-            "port": os.environ["PG_PORT_PRD"],
-            "database": os.environ["PG_DATABASE_PRD"],
-            "user": os.environ["PG_USER_PRD"],
-            "password": os.environ["PG_PASSWORD_PRD"],
-        }
-    engine = create_engine("postgresql://{user}:{password}@{host}:{port}/{database}".format(**pgconfig))
-    return psycopg2.connect(**pgconfig), engine
+def connect():
+    config = {
+        "host": os.environ['MYSQL_HOST'],
+        "port": int(os.environ['MYSQL_PORT']),
+        "database": os.environ['MYSQL_DATABASE'],
+        "user": os.environ['MYSQL_USER'],
+        "password": os.environ['MYSQL_PASSWORD'],
+    }
+    conn = pymysql.connect(**config)
+    engine = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}?charset=utf8'.format(**config))
+    return conn, engine
 
 
 def execute(conn, sql):

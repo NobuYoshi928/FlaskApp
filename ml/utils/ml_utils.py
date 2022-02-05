@@ -23,7 +23,7 @@ def transrate_abnormal_value(df):
 
 
 def preprocess_train(train_X):
-    train_X.drop("index", axis=1, inplace=True)
+    train_X.drop("id", axis=1, inplace=True)
     train_X = transrate_abnormal_value(train_X)
     imputer = SimpleImputer(strategy="median")
     train_X = pd.DataFrame(imputer.fit_transform(train_X), columns=train_X.columns)
@@ -31,7 +31,7 @@ def preprocess_train(train_X):
 
 
 def preprocess_test(test_X, imputer):
-    test_X.drop("index", axis=1, inplace=True)
+    test_X.drop("id", axis=1, inplace=True)
     test_X = transrate_abnormal_value(test_X)
     test_X = pd.DataFrame(imputer.transform(test_X), columns=test_X.columns)
     return test_X
@@ -48,7 +48,9 @@ def evaluate_model(test_X, test_y, model):
     return auc(fpr, tpr)
 
 
-def output(output_dir, src_df, train_X, model, imputer=None, test_X=None, train_indexes=None):
+def output(
+    output_dir, src_df, train_X, model, imputer=None, test_X=None, train_indexes=None
+):
     os.makedirs(f"{output_dir}data/")
     os.makedirs(f"{output_dir}models/")
     src_output_path = f"{output_dir}data/src.pkl"
@@ -65,7 +67,7 @@ def output(output_dir, src_df, train_X, model, imputer=None, test_X=None, train_
     if test_X is not None:
         test_X.to_pickle(testX_output_path)
     if train_indexes:
-        with open(train_indexes_path, mode='w') as f:
+        with open(train_indexes_path, mode="w") as f:
             f.write(train_indexes)
 
 
@@ -90,7 +92,7 @@ def train_and_deploy_model(run_id, C):
     try:
         deploy_dir = f"./deploy/{run_id}/"
         src_df = pd.read_pickle(f"./evaluate/{run_id}/data/src.pkl")
-        train_indexes = ','.join([str(i) for i in src_df['index'].values.tolist()])
+        train_indexes = ",".join([str(i) for i in src_df["id"].values.tolist()])
         train_X, train_y = src_df.iloc[:, :-1], src_df.iloc[:, -1]
         train_X, imputer = preprocess_train(train_X)
         model = train_model(train_X, train_y, C)
@@ -105,6 +107,3 @@ def predict(input_X, imputer, model):
     input_y_proba = model.predict_proba(input_X)[:, 1]
     input_y_pred = model.predict(input_X)
     return input_y_proba, input_y_pred
-    
-    
-

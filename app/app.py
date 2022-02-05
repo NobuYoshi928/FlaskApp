@@ -15,7 +15,6 @@ from sklearn.metrics import roc_curve
 from utils import db_utils, ml_utils
 
 # デプロイパラメタから対象リソースを取得
-env = os.getenv("APP_ENV")
 with open("./deploy_param.json") as f:
     deploy_param = json.load(f)
 index_id = deploy_param["index_id"]
@@ -25,7 +24,7 @@ imputer = pickle.load(open(f"./deploy/model/imputer_{imputer_id}.pkl", "rb"))
 model = pickle.load(open(f"./deploy/model/model_{model_id}.pkl", "rb"))
 
 # DB接続とDataFrameへの読み込み
-conn, engine = db_utils.connect(env)
+conn, engine = db_utils.connect()
 train_df = pd.read_sql(
     sql="SELECT * FROM diabetes_diagnosis_results WHERE is_trained is True;", con=conn
 ).drop("is_trained", axis=1, inplace=False)
@@ -34,7 +33,7 @@ not_train_df = pd.read_sql(
 ).drop("is_trained", axis=1, inplace=False)
 predict_result_df = pd.read_sql(sql="SELECT * FROM predict_results;", con=conn)
 src_columns = (
-    "index",
+    "id",
     "pregnancies",
     "glucose",
     "blood_pressure",
@@ -47,14 +46,14 @@ src_columns = (
     "is_trained",
 )
 predict_result_columns = (
-    "index",
+    "id",
     "predict_result",
     "predict_probability",
     "true_result",
     "model_id",
 )
 results_temp_columns = (
-    "index",
+    "id",
     "pregnancies",
     "glucose",
     "blood_pressure",
@@ -73,17 +72,17 @@ def update_tables():
         trained_indexes = f.readlines()[0]
     sql = f"""
         UPDATE diabetes_diagnosis_results SET is_trained = True 
-        WHERE index in ({trained_indexes})
+        WHERE id in ({trained_indexes})
         """
     db_utils.execute(conn, sql)
     sql = f"""
         UPDATE diabetes_diagnosis_results SET is_trained = False 
-        WHERE index not in ({trained_indexes})
+        WHERE id not in ({trained_indexes})
         """
     db_utils.execute(conn, sql)
     sql = f"""
         DELETE FROM predict_results
-        WHERE index in ({trained_indexes})
+        WHERE id in ({trained_indexes})
         """
     db_utils.execute(conn, sql)
     sql = f"""
@@ -122,7 +121,7 @@ def create_roc_curve():
 
 def create_label_counts():
     df = pd.read_sql(
-        sql="SELECT index, outcome, is_trained FROM diabetes_diagnosis_results;",
+        sql="SELECT id, outcome, is_trained FROM diabetes_diagnosis_results;",
         con=conn,
     )
     value_counts_df = df.groupby(["outcome", "is_trained"]).count().reset_index()
@@ -133,7 +132,7 @@ def create_label_counts():
         lambda x: "train data" if x else "predict data"
     )
     fig = px.histogram(
-        value_counts_df, x="is_trained", y="index", color="outcome", barmode="group"
+        value_counts_df, x="is_trained", y="id", color="outcome", barmode="group"
     )
     fig.update_layout(
         title="True Lavel Counts",
@@ -192,9 +191,9 @@ app.layout = html.Div(
                         html.H3("測定値を入力してください"),
                         html.Div(
                             [
-                                "index:",
+                                "id:",
                                 dcc.Input(
-                                    id="select-index",
+                                    id="select-id",
                                     type="number",
                                 ),
                             ]
@@ -348,7 +347,7 @@ app.layout = html.Div(
     Output(component_id="predict_result", component_property="children"),
     [Input(component_id="predict-button", component_property="n_clicks")],
     [
-        State(component_id="select-index", component_property="value"),
+        State(component_id="select-id", component_property="value"),
         State(component_id="select-pregnancies", component_property="value"),
         State(component_id="select-glucose", component_property="value"),
         State(component_id="select-blood_pressure", component_property="value"),
@@ -363,7 +362,7 @@ app.layout = html.Div(
 )
 def predict(
     n_clicks,
-    index,
+    id,
     pregnancies,
     glucose,
     blood_pressure,
@@ -375,7 +374,7 @@ def predict(
 ):
     if n_clicks >= 1:
         input_dict = {
-            "index": [index],
+            "id": [id],
             "pregnancies": [pregnancies],
             "glucose": [glucose],
             "blood_pressure": [blood_pressure],
@@ -389,31 +388,27 @@ def predict(
         input_y_proba, input_y_pred = ml_utils.predict(input_df, imputer, model)
         input_df["predict_result"] = input_y_pred[0]
         input_df["predict_probability"] = input_y_proba[0]
-        input_df["index"] = index
+        input_df["id"] = id
         input_df.reindex(index=results_temp_columns)
         try:
             input_df.to_sql("results_temp", con=engine, if_exists="append", index=False)
-            return (
-                f'患者番号{index}は{"陽性" if input_y_pred[0] == 1 else "陰性"}です。予測結果は正しいですか？'
-            )
+            return f'患者番号{id}は{"陽性" if input_y_pred[0] == 1 else "陰性"}です。予測結果は正しいですか？'
         except:
-            return (
-                f'患者番号{index}は{"陽性" if input_y_pred[0] == 1 else "陰性"}です。予測結果は正しいですか？'
-            )
+            return f'患者番号{id}は{"陽性" if input_y_pred[0] == 1 else "陰性"}です。予測結果は正しいですか？'
 
 
 @app.callback(
     Output(component_id="register_done_message", component_property="children"),
     [Input(component_id="register-button", component_property="n_clicks")],
     [
-        State(component_id="select-index", component_property="value"),
+        State(component_id="select-id", component_property="value"),
         State(component_id="select_result", component_property="value"),
     ],
 )
-def register(n_clicks, index, is_prediction_true):
+def register(n_clicks, id, is_prediction_true):
     if n_clicks >= 1:
         temp_df = pd.read_sql(
-            sql=f"SELECT * FROM results_temp WHERE index = {index};", con=conn
+            sql=f"SELECT * FROM results_temp WHERE id = {id};", con=conn
         )
         predict_result = temp_df["predict_result"][0]
         if is_prediction_true == "no":
@@ -429,10 +424,10 @@ def register(n_clicks, index, is_prediction_true):
         src_record_df["is_trained"] = False
         src_record_df.reindex(index=src_columns)
         # predict_resultsテーブルにレコードを追加
-        temp_df = temp_df[["index", "predict_result", "predict_probability"]]
+        temp_df = temp_df[["id", "predict_result", "predict_probability"]]
         temp_df["true_result"] = true_result
         temp_df["model_id"] = model_id
-        temp_df.reindex(index=predict_result_columns)
+        temp_df.reindex(id=predict_result_columns)
         try:
             src_record_df.to_sql(
                 "diabetes_diagnosis_results",

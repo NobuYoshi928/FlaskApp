@@ -11,7 +11,6 @@ RUN pip install --upgrade pip && pip install \
   numpy==1.17.2 \
   pandas==0.25.1 \
   scikit-learn==0.21.3 \
-  PyMySQL==1.0.2 \
   sqlalchemy==1.4.29 \
   PyMySQL==1.0.2
 
