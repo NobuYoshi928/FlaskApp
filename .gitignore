@@ -10,4 +10,3 @@ db/data/
 db/init/init_input_data.csv
 db/init/init_predict_result_data.csv
 db/init/init_train_data.csv
-.github/workflows/deploy.yml
