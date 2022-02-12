@@ -189,12 +189,12 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # レイアウト
 app.layout = html.Div(
-    children=[
-        html.H1(children="糖尿病予測アプリ"),
+    [
+        html.H1("糖尿病予測アプリ"),
         html.Div(
-            children=[
+            [
                 html.Div(
-                    children=[
+                    [
                         html.H3("測定値を入力してください"),
                         html.Div(
                             [
@@ -318,9 +318,9 @@ app.layout = html.Div(
             ],
         ),
         html.Div(
-            children=[
+            [
                 html.Div(
-                    children=[
+                    [
                         dcc.Graph(
                             id="roc_curve",
                             figure=create_roc_curve(),

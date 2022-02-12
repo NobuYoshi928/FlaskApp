@@ -39,7 +39,19 @@
           {
             "name": "MYSQL_PASSWORD",
             "valueFrom": "MYSQL_PASSWORD"
-        }
+          },
+          {
+            "name": "MYSQL_PORT",
+            "valueFrom": "MYSQL_PORT"
+          },
+          {
+            "name": "MYSQL_DATABASE",
+            "valueFrom": "MYSQL_DATABASE"
+          },
+          {
+            "name": "MYSQL_USER",
+            "valueFrom": "MYSQL_USER"
+          }
         ],
         "dockerSecurityOptions": null,
         "memory": null,

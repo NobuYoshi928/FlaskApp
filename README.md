@@ -19,7 +19,7 @@ Microsoft社の定義するMLOpsの3つ重要概念を参考に、以下を考�
 - Docker / Docker-compose
 - GitHub Actions
 - AWS
-  - ECS(Fargate) / ECR / RDS / EC2
+  - ECS(Fargate) / ECR / RDS / EC2 / ELB / SSM
 
 ## インフラ構成
 
