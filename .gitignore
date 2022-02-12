@@ -6,6 +6,7 @@ app/ml/utils/__pycache__/
 app/ml/temp/
 app/ml/data/
 aws_setting/
+aws_infla.drawio
 db/data/
 db/init/init_input_data.csv
 db/init/init_predict_result_data.csv

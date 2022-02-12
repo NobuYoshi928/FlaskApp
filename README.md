@@ -1,7 +1,7 @@
 ## アプリ概要
 MLOps学習の一環として、糖尿病診断アプリを作成しました。各測定データを入力することで、その患者が糖尿病か否かの二値分類予測を行います。  以前参加したSIGNATEのコンペ：[【第8回_Beginner限定コンペ】診断データを使った糖尿病発症予測](https://signate.jp/competitions/414)を題材とさせていただいております。
 
-URL：
+URL：http://mlops-diabetes-diagnosis-alb-1799143370.ap-northeast-1.elb.amazonaws.com:5050/
 
 Microsoft社の定義するMLOpsの3つ重要概念を参考に、以下を考慮しました。
 - モデルのより迅速な実験と開発 → 機械学習向けPipelineライブラリgorkartによるワークフロー管理
