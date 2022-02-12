@@ -1,8 +1,7 @@
 FROM python:3.7.4
 
+COPY ./app /app
 WORKDIR /app
-
-COPY . /app
 
 RUN pip install --upgrade pip && pip install \
   dash==2.0.0 \
@@ -12,6 +11,9 @@ RUN pip install --upgrade pip && pip install \
   sqlalchemy==1.4.29 \
   PyMySQL==1.0.2
 
+ENV APP_ENV ppp
+ENV MYSQL_HOST ${MYSQL_HOST}
+ENV MYSQL_PASSWORD ${PASSWORD}
 ENV MYSQL_PORT 3306
 ENV MYSQL_DATABASE diabetes_diagnosis
 ENV MYSQL_USER admin
