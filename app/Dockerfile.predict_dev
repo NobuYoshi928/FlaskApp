@@ -4,8 +4,6 @@ RUN curl -O https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedrive
 
 WORKDIR /app
 
-COPY . /app
-
 RUN pip install --upgrade pip && pip install \
   dash==2.0.0 \
   numpy==1.17.2 \
@@ -13,8 +11,7 @@ RUN pip install --upgrade pip && pip install \
   scikit-learn==0.21.3 \
   PyMySQL==1.0.2 \
   sqlalchemy==1.4.29 \
-  selenium==3.141.0 \
-  webdriver_manager==3.5.2
+  boto3==1.20.54
 
 ENV APP_ENV dev
 ENV LANG ja_JP.UTF-8

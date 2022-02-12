@@ -31,7 +31,16 @@
         "dnsServers": null,
         "mountPoints": [],
         "workingDirectory": null,
-        "secrets": null,
+        "secrets": [
+          {
+              "name": "MYSQL_HOST",
+              "valueFrom": "MYSQL_HOST"
+          },
+          {
+            "name": "MYSQL_PASSWORD",
+            "valueFrom": "MYSQL_PASSWORD"
+        }
+        ],
         "dockerSecurityOptions": null,
         "memory": null,
         "memoryReservation": 128,

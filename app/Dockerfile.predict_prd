@@ -10,11 +10,9 @@ RUN pip install --upgrade pip && pip install \
   scikit-learn==0.21.3 \
   sqlalchemy==1.4.29 \
   PyMySQL==1.0.2 \
-  boto3
+  boto3==1.20.54
 
-ENV APP_ENV prd
-ENV MYSQL_HOST ${MYSQL_HOST}
-ENV MYSQL_PASSWORD ${MYSQL_PASSWORD}
+ENV APP_ENV ppp
 ENV MYSQL_PORT 3306
 ENV MYSQL_DATABASE diabetes_diagnosis
 ENV MYSQL_USER admin

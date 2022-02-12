@@ -1,5 +1,6 @@
 import os
 
+import boto3
 import pymysql.cursors
 from sqlalchemy import create_engine
 
@@ -17,8 +18,6 @@ def get_parameters(param_key):
 
 def connect():
     if os.environ["APP_ENV"] == "prd":
-        import boto3
-
         config = {
             "host": get_parameters("MYSQL_HOST"),
             "port": int(get_parameters("MYSQL_PORT")),
