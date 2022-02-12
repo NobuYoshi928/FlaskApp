@@ -56,4 +56,4 @@ services:
     links:
       - db
     volumes:
-      - ./app/ml:/work
+      - ./app/ml:/home/jovyan/work
