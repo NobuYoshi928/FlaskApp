@@ -10,7 +10,8 @@ Microsoft社の定義するMLOpsの3つ重要概念を参考に、以下を考�
 
 ### アプリ概要とワークフロー
 
-![MLOpsAppワークフロー](https://user-images.githubusercontent.com/62184606/153701410-f1c7218c-3deb-4226-aa9a-3b2a388165d7.png)
+![aws_infla](https://user-images.githubusercontent.com/62184606/154516808-92c49f65-8ee4-4489-ac18-03bee88a8f73.png)
+
 
 ## 使用技術
 - Python 3.7.4
