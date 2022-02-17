@@ -10,7 +10,7 @@ Microsoft社の定義するMLOpsの3つ重要概念を参考に、以下を考�
 
 ### アプリ概要とワークフロー
 
-![aws_infla](https://user-images.githubusercontent.com/62184606/154516808-92c49f65-8ee4-4489-ac18-03bee88a8f73.png)
+![MLOpsAppワークフロー](https://user-images.githubusercontent.com/62184606/154518012-83d86db5-a05f-48f5-a4eb-408859dbf6cd.png)
 
 
 ## 使用技術
@@ -24,4 +24,4 @@ Microsoft社の定義するMLOpsの3つ重要概念を参考に、以下を考�
 
 ## インフラ構成
 
-![aws_infla](https://user-images.githubusercontent.com/62184606/153701468-07e8ad8c-e2c1-442c-8ec6-4c1384e8e216.png)
+![aws_infla](https://user-images.githubusercontent.com/62184606/154516808-92c49f65-8ee4-4489-ac18-03bee88a8f73.png)
